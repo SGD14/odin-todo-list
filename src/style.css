@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#global-container {
+    display: grid;
+    grid-template-columns: 15% 85%;
+    min-height: 100vh;
+}
+
+.project-menu {
+    padding-left: 10%;
+    padding-right: 10%;
+    background-color: rgb(100, 148, 237);
+    text-align: center;
+}
+
+.project-menu > h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.project-menu > h2 > .line {
+    flex: auto;
+    background-color: black;
+    height: 1px;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-list > button {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    font-size: large;
+    border: 0px;
+    border-radius: 10px;
+    background: none;
+    text-align: justify;
+}
+
+.project-list > button:hover, .project-list > button.selected {
+    background-color: rgb(148, 178, 235);
+}
+
+.project-list > input {
+    margin-top: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    border: 0px;
+    border-radius: 10px;
+    background: none;
+    text-align: justify;
+}
