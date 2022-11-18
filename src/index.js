@@ -1,3 +1,4 @@
+import './style.css'
 import TodoDatabase from './TodoDatabase';
 
 const createProjectsMenu = (projectList) => {
