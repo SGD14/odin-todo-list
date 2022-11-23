@@ -19,11 +19,34 @@
                 </div>
             </div>
             <div class="project-content">
+                <div class="todo-creation-container">
+                    <label>New To-Do Name</label>
+                    <input class="new-todo-name" type="text" name="new-todo-name" id="new-todo-name" placeholder="New To-Do name...">
+                    <label>New To-Do Description</label>
+                    <textarea class="new-todo-description" placeholder="New To-Do description..."></textarea>
+                    <div class="date-and-priority">
+                        <label>Due Date</label>
+                        <label>Priority</label>
+                        <input type="date" name="new-todo-date" id="new-todo-date">
+                        <div><span><input type="radio" name="priority" id="high-priority">High</span><span><input type="radio" name="priority" id="high-priority" checked>Normal</span><span><input type="radio" name="priority" id="low-priority">Low</span></div>
+                    </div>
+                    <button class="new-todo-create-button">Create To-Do</button>
+                </div>
                 <div class="todo-item">
-                    <span class="arrow">></span>
-                    <span class="name">Todo Name</span>
-                    <span class="due">Due: 22-02-2022</span>
-                    <span class="priority">High Priority</span>
+                    <div class="item-content">
+                        <span class="arrow">></span>
+                        <span class="name">Todo Name</span>
+                        <span class="due">Due: 22-02-2022</span>
+                        <span class="priority">High Priority</span>
+                    </div>
+                    <div class="item-expand">
+                        <span class="description">This is a To-Do description.</span>
+                        <div class="buttons">
+                            <button class="complete-button">Mark Completed</button>
+                            <button class="edit-button">Edit</button>
+                            <button class="delete-button">Delete</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
