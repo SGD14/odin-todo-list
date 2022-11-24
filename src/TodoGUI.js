@@ -12,9 +12,7 @@ const TodoGUI = () => {
     return globalContainer;
 };
 
-const ProjectNavigationMenu = (onProjectSelected) => {
-    let selectedProject = TodoDatabase.getProjects()[0];
-    
+const ProjectNavigationMenu = (onProjectSelected) => {    
     const projectNavigationMenu = createElement("div", ["project-menu"], "");
 
     const header = createElement("h1", [], "To-Do App");
@@ -31,13 +29,22 @@ const ProjectNavigationMenu = (onProjectSelected) => {
 
     const projectListContainer = createElement("div", ["project-list"], "");
 
+    const setSelected = (button) => {
+        projectListContainer.childNodes.forEach(node => {
+            if(node === button)
+                node.classList.add("selected");
+            else
+                node.classList.remove("selected");
+        });
+    };
+
     const ProjectButton = (project) => {
         const projectButton = createElement("button", [], project.getName());
-        
-        if(project === selectedProject)
-            projectButton.classList.add("selected");
 
-        projectButton.addEventListener('click', event => onProjectSelected(project));
+        projectButton.addEventListener('click', event => {
+            setSelected(projectButton);
+            onProjectSelected(project);
+        });
 
         return projectButton;
     }
@@ -45,6 +52,8 @@ const ProjectNavigationMenu = (onProjectSelected) => {
     TodoDatabase.getProjects().forEach(project => {
         projectListContainer.appendChild(ProjectButton(project));
     });
+
+    projectListContainer.firstChild.classList.add("selected");
 
     const newProjectInput = createElement("input", [], "");
     newProjectInput.type = "text";
@@ -56,7 +65,15 @@ const ProjectNavigationMenu = (onProjectSelected) => {
 
             if(newProjectName) {
                 const newProject = TodoDatabase.addNewProject(newProjectName);
-                projectListContainer.insertBefore(ProjectButton(newProject), newProjectInput);
+                const newProjectButton = ProjectButton(newProject);
+
+                projectListContainer.insertBefore(newProjectButton, newProjectInput);
+
+                setSelected(newProjectButton);
+                onProjectSelected(newProject);
+
+                newProjectInput.value = "";
+                newProjectInput.blur();
             }
         }
     })
