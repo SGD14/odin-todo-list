@@ -47,7 +47,7 @@ body {
 }
 
 .project-list > button:hover, .project-list > button.selected {
-
+    background-color: rgb(222, 222, 222);
 }
 
 .project-list > input {

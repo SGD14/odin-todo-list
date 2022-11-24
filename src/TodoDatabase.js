@@ -28,7 +28,7 @@ const TodoDatabase = (() => {
         const getPriority = () => priority;
         const getCompleted = () => completed;
 
-        const setTitle = (newTitle) => {
+        const setName = (newTitle) => {
             name = newTitle;
             saveData();
         }
@@ -53,14 +53,14 @@ const TodoDatabase = (() => {
             saveData();
         }
 
-        return {getName, setTitle, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, getCompleted, setCompleted};
+        return {getName, setName, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, getCompleted, setCompleted};
     }
 
     const saveToLocalStorage = () => {
         const data = projectList.map(project => { return {
             name: project.getName(),
             todoList: project.getTodoList().map(todo => { return {
-                title: todo.getTitle(),
+                title: todo.getName(),
                 description: todo.getDescription(),
                 dueDate: todo.getDueDate(),
                 priority: todo.getPriority(),
@@ -87,8 +87,11 @@ const TodoDatabase = (() => {
     const getProjects = () => projectList;
 
     const addNewProject = (name) => {
-        projectList.push(createProject(name, []));
+        const newProject = createProject(name, []);
+        projectList.push(newProject);
         saveToLocalStorage();
+
+        return newProject;
     };
 
     const removeProject = (project) => {

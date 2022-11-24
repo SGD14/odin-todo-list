@@ -6,13 +6,15 @@ const TodoGUI = () => {
 
     const onProjectSelected = (project) => console.log("Project Selected! " + project.getName());
 
-    globalContainer.appendChild(ProjectNavigationMenu(TodoDatabase.getProjects(), onProjectSelected));
+    globalContainer.appendChild(ProjectNavigationMenu(onProjectSelected));
     globalContainer.appendChild(ProjectContent(TodoDatabase.getProjects()[0]));
 
     return globalContainer;
 };
 
-const ProjectNavigationMenu = (projectList, onProjectSelected) => {
+const ProjectNavigationMenu = (onProjectSelected) => {
+    let selectedProject = TodoDatabase.getProjects()[0];
+    
     const projectNavigationMenu = createElement("div", ["project-menu"], "");
 
     const header = createElement("h1", [], "To-Do App");
@@ -29,17 +31,35 @@ const ProjectNavigationMenu = (projectList, onProjectSelected) => {
 
     const projectListContainer = createElement("div", ["project-list"], "");
 
-    projectList.forEach(project => {
+    const ProjectButton = (project) => {
         const projectButton = createElement("button", [], project.getName());
+        
+        if(project === selectedProject)
+            projectButton.classList.add("selected");
 
         projectButton.addEventListener('click', event => onProjectSelected(project));
 
-        projectListContainer.appendChild(projectButton);
+        return projectButton;
+    }
+
+    TodoDatabase.getProjects().forEach(project => {
+        projectListContainer.appendChild(ProjectButton(project));
     });
 
     const newProjectInput = createElement("input", [], "");
     newProjectInput.type = "text";
     newProjectInput.placeholder = "New Project...";
+
+    newProjectInput.addEventListener("keypress", event => {
+        if(event.key === "Enter") {
+            const newProjectName = newProjectInput.value;
+
+            if(newProjectName) {
+                const newProject = TodoDatabase.addNewProject(newProjectName);
+                projectListContainer.insertBefore(ProjectButton(newProject), newProjectInput);
+            }
+        }
+    })
 
     projectListContainer.appendChild(newProjectInput);
 
