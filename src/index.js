@@ -1,12 +1,6 @@
 import './style.css'
-import TodoDatabase from './TodoDatabase';
+import TodoGUI from './TodoGUI';
 
-const createProjectsMenu = (projectList) => {
+const rootElement = document.querySelector("#root");
 
-}
-
-const createTodosMenu = (todoList) => {
-
-}
-
-console.log(TodoDatabase.getProjects());
+rootElement.appendChild(TodoGUI);
