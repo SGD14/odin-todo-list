@@ -37,10 +37,16 @@ const ProjectNavigationMenu = (projectList, onProjectSelected) => {
         projectListContainer.appendChild(projectButton);
     });
 
+    const newProjectInput = createElement("input", [], "");
+    newProjectInput.type = "text";
+    newProjectInput.placeholder = "New Project...";
+
+    projectListContainer.appendChild(newProjectInput);
+
     projectNavigationMenu.appendChild(header);
     projectNavigationMenu.appendChild(subHeader);
     projectNavigationMenu.appendChild(projectListContainer);
-
+    
     return projectNavigationMenu;
 }
 
