@@ -42,12 +42,29 @@ const ProjectNavigationMenu = (onProjectSelected) => {
     };
 
     const ProjectButton = (project) => {
-        const projectButton = createElement("button", [], project.getName());
+        const projectButton = createElement("button", [], "");
 
-        projectButton.addEventListener('click', event => {
+        projectButton.appendChild(createElement("span", [], project.getName()));
+
+        const deleteButton = createElement("button", ["delete-button"], "X");
+        projectButton.appendChild(deleteButton);
+
+        projectButton.addEventListener("click", event => {
             setSelected(projectButton);
             onProjectSelected(project);
         });
+
+        deleteButton.addEventListener("click", event => {
+            event.stopPropagation();
+
+            if(TodoDatabase.getProjects().length <= 1) 
+                return;
+
+            TodoDatabase.removeProject(project);
+            projectListContainer.removeChild(projectButton);
+            setSelected(projectListContainer.firstChild);
+            onProjectSelected(TodoDatabase.getProjects()[0]);
+        })
 
         return projectButton;
     }

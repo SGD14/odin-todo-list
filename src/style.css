@@ -47,6 +47,23 @@ body {
     text-align: justify;
 }
 
+.project-list > button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-list > button > button {
+    background-color: transparent;
+    border-radius: 10px;
+    border: none;
+}
+
+.project-list > button > button:hover {
+    background-color: rgb(200, 200, 200);
+    cursor: pointer;
+}
+
 .project-list > button:hover {
     background-color: rgb(245, 245, 245);
     cursor: pointer;
