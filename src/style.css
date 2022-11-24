@@ -33,6 +33,7 @@ body {
 .project-list {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
 }
 
 .project-list > button {
@@ -46,8 +47,13 @@ body {
     text-align: justify;
 }
 
-.project-list > button:hover, .project-list > button.selected {
-    background-color: rgb(222, 222, 222);
+.project-list > button:hover {
+    background-color: rgb(245, 245, 245);
+    cursor: pointer;
+} 
+
+.project-list > button.selected {
+    background-color: rgb(220, 220, 220);
 }
 
 .project-list > input {

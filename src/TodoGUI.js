@@ -4,7 +4,10 @@ const TodoGUI = () => {
     const globalContainer = document.createElement("div");
     globalContainer.id = "global-container";
 
-    const onProjectSelected = (project) => console.log("Project Selected! " + project.getName());
+    const onProjectSelected = (project) => {
+        globalContainer.removeChild(globalContainer.lastChild);
+        globalContainer.appendChild(ProjectContent(project));
+    }
 
     globalContainer.appendChild(ProjectNavigationMenu(onProjectSelected));
     globalContainer.appendChild(ProjectContent(TodoDatabase.getProjects()[0]));
