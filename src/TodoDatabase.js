@@ -21,15 +21,15 @@ const TodoDatabase = (() => {
         return {getName, setName, getTodoList, addNewTodo, removeTodo};
     }
 
-    const createTodo = ({title, description, dueDate, priority, completed}) => {
-        const getTitle = () => title;
+    const createTodo = (name, description, dueDate, priority, completed) => {
+        const getName = () => name;
         const getDescription = () => description;
         const getDueDate = () => dueDate;
         const getPriority = () => priority;
         const getCompleted = () => completed;
 
         const setTitle = (newTitle) => {
-            title = newTitle;
+            name = newTitle;
             saveData();
         }
 
@@ -53,7 +53,7 @@ const TodoDatabase = (() => {
             saveData();
         }
 
-        return {getTitle, setTitle, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, getCompleted, setCompleted};
+        return {getName, setTitle, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, getCompleted, setCompleted};
     }
 
     const saveToLocalStorage = () => {
@@ -79,7 +79,7 @@ const TodoDatabase = (() => {
                 createProject(project.name, project.todoList.map(todo => 
                     createTodo(todo.title, todo.description, todo.dueDate, todo.priority, todo.completed))));
 
-        return [createProject("Default Project", [])];
+        return [createProject("Default Project", [createTodo("Default To-Do", "This is a default To-Do item.", Date.now().toString(), "Normal", false)])];
     }
 
     let projectList = loadFromLocalStorage();
