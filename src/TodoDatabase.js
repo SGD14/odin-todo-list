@@ -9,8 +9,10 @@ const TodoDatabase = (() => {
         const getTodoList = () => todoList;
 
         const addNewTodo = (title, description, dueDate, priority) => {
-            todoList.push(createTodo(title, description, dueDate, priority, false));
+            const newTodo = createTodo(title, description, dueDate, priority, false);
+            todoList.push(newTodo);
             saveToLocalStorage();
+            return newTodo;
         }
 
         const removeTodo = (todo) => {
@@ -26,34 +28,34 @@ const TodoDatabase = (() => {
         const getDescription = () => description;
         const getDueDate = () => dueDate;
         const getPriority = () => priority;
-        const getCompleted = () => completed;
+        const isCompleted = () => completed;
 
         const setName = (newTitle) => {
             name = newTitle;
-            saveData();
+            saveToLocalStorage();
         }
 
         const setDescription = (newDescription) => {
             description = newDescription;
-            saveData();
+            saveToLocalStorage();
         }
 
         const setDueDate = (newDueDate) => {
             dueDate = newDueDate;
-            saveData();
+            saveToLocalStorage();
         }
 
         const setPriority = (newPriority) => {
             priority = newPriority;
-            saveData();
+            saveToLocalStorage();
         }
 
         const setCompleted = (newCompleted) => {
             completed = newCompleted;
-            saveData();
+            saveToLocalStorage();
         }
 
-        return {getName, setName, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, getCompleted, setCompleted};
+        return {getName, setName, getDescription, setDescription, getDueDate, setDueDate, getPriority, setPriority, isCompleted, setCompleted};
     }
 
     const saveToLocalStorage = () => {
@@ -64,7 +66,7 @@ const TodoDatabase = (() => {
                 description: todo.getDescription(),
                 dueDate: todo.getDueDate(),
                 priority: todo.getPriority(),
-                completed: todo.getCompleted()
+                completed: todo.isCompleted()
             }})
         }});
 

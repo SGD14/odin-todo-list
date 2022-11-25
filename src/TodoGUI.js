@@ -15,7 +15,7 @@ const TodoGUI = () => {
     return globalContainer;
 };
 
-const ProjectNavigationMenu = (onProjectSelected) => {    
+const ProjectNavigationMenu = (onProjectSelected) => {
     const projectNavigationMenu = createElement("div", ["project-menu"], "");
 
     const header = createElement("h1", [], "To-Do App");
@@ -34,14 +34,15 @@ const ProjectNavigationMenu = (onProjectSelected) => {
 
     projectNavigationMenu.appendChild(subHeader);
 
-    let projectNavigationList = ProjectNavigationList(TodoDatabase.getProjects(), TodoDatabase.getProjects()[0], project => console.log("Project " + project.getName() + " selected!"));
+    let projectNavigationList = ProjectNavigationList(TodoDatabase.getProjects(), TodoDatabase.getProjects()[0], onProjectSelected);
     projectNavigationMenu.appendChild(projectNavigationList);
 
     const addNewProject = (newProjectName) => {
         const newProject = TodoDatabase.addNewProject(newProjectName);
 
         const oldNode = projectNavigationList;
-        const newNode = ProjectNavigationList(TodoDatabase.getProjects(), newProject, project => console.log("Project " + project.getName() + " selected!"));
+        const newNode = ProjectNavigationList(TodoDatabase.getProjects(), newProject, onProjectSelected);
+        onProjectSelected(newProject);
 
         projectNavigationMenu.replaceChild(newNode, oldNode);
 
@@ -137,18 +138,29 @@ const ProjectCreationInput = (onSubmit) => {
 const ProjectContent = (project) => {
     const projectContent = createElement("div", ["project-content"], "");
 
-    projectContent.appendChild(TodoCreationContainer());
+    const onTodoComplete = (todoItem, todo) => {
+        project.removeTodo(todo);
+        projectContent.removeChild(todoItem);
+    }
 
-    console.log(project);
+    const onTodoCreated = (name, description, dueDate, priority) => {
+        const newTodo = project.addNewTodo(name, description, dueDate, priority);
+        const newTodoItem = TodoItem(newTodo, () => onTodoComplete(newTodoItem, newTodo));
 
-    project.getTodoList().forEach(todo => {
-        projectContent.appendChild(TodoItem(todo));
+        projectContent.appendChild(newTodoItem);
+    }
+
+    projectContent.appendChild(TodoCreationContainer(onTodoCreated));
+
+    project.getTodoList().filter(todo => !todo.isCompleted()).forEach(todo => {
+        const newTodoItem = TodoItem(todo, () => onTodoComplete(newTodoItem, todo));
+        projectContent.appendChild(newTodoItem);
     });
 
     return projectContent;
 }
 
-const TodoCreationContainer = () => {
+const TodoCreationContainer = (onTodoSubmit) => {
     const todoCreationContainer = createElement("div", ["todo-creation-container"], "");
     todoCreationContainer.appendChild(createElement("label", [], "New To-Do Name"));
     
@@ -167,16 +179,16 @@ const TodoCreationContainer = () => {
     const newTodoDateAndPriorityContainer = createElement("div", ["date-and-priority"], "");
     newTodoDateAndPriorityContainer.appendChild(createElement("label", [], "Due Date"));
     newTodoDateAndPriorityContainer.appendChild(createElement("label", [], "Priority"));
-    const newTodoDateField = createElement("input", ["new-todo-date"], "");
-    newTodoDateField.type = "date";
-    newTodoDateAndPriorityContainer.appendChild(newTodoDateField);
+    const newTodoDueDateField = createElement("input", ["new-todo-date"], "");
+    newTodoDueDateField.type = "date";
+    newTodoDateAndPriorityContainer.appendChild(newTodoDueDateField);
     const newTodoPriorityContainer = createElement("div", [], "");
     ["Low", "Normal", "High"].forEach(priority => {
         const priorityContainer = createElement("span", [], "");
         const priorityRadioButton = createElement("input", [], "");
         priorityRadioButton.type = "radio";
         priorityRadioButton.name = "priority";
-        priorityRadioButton.id = priority.toLowerCase() + "-priority";
+        priorityRadioButton.value = priority;
         if(priority === "Normal") priorityRadioButton.checked = true;
         priorityContainer.appendChild(priorityRadioButton);
         priorityContainer.appendChild(createElement("span", [], priority));
@@ -187,36 +199,125 @@ const TodoCreationContainer = () => {
     todoCreationContainer.appendChild(newTodoDateAndPriorityContainer);
 
     const createButton = createElement("button", ["new-todo-create-button"], "Create To-Do");
-    createButton.addEventListener("click", event => console.log("Create Button Clicked!"));
+
+    createButton.addEventListener("click", event => {
+        const newTodoName = newTodoNameField.value;
+        const newTodoDescription = newTodoDescriptionField.value;
+        const newTodoDueDate = newTodoDueDateField.value;
+        const newTodoPriority = document.querySelector('input[name="priority"]:checked').value;
+
+        if(!newTodoName) return;
+        if(!newTodoDueDate) return;
+        if(!newTodoPriority) return;
+
+        newTodoNameField.value = "";
+        newTodoDescriptionField.value = "";
+        newTodoDueDateField.value = "";
+        document.querySelector('input[value="Normal"]').checked = true;
+
+        onTodoSubmit(newTodoName, newTodoDescription, newTodoDueDate, newTodoPriority);
+    });
+
     todoCreationContainer.appendChild(createButton);
 
     return todoCreationContainer;
 }
 
-const TodoItem = (todo) => {
+const TodoItem = (todo, onCompleteClick) => {
     const todoContainer = createElement("div", ["todo-item"], "");
-
-    console.log(todo);
 
     const todoContent = createElement("div", ["item-content"], "");
     todoContent.appendChild(createElement("span", ["arrow"], ">"));
-    todoContent.appendChild(createElement("span", ["name"], todo.getName()));
-    todoContent.appendChild(createElement("span", ["due"], todo.getDueDate().toString()));
-    todoContent.appendChild(createElement("span", ["priority"], todo.getPriority()));
+    const nameSpan = createElement("span", ["name"], todo.getName());
+    todoContent.appendChild(nameSpan);
+    const dueDateSpan = createElement("span", ["due"], todo.getDueDate().toString());
+    todoContent.appendChild(dueDateSpan);
+    const prioritySpan = createElement("span", ["priority"], todo.getPriority());
+    todoContent.appendChild(prioritySpan);
 
     todoContainer.appendChild(todoContent);
 
     const todoExpand = createElement("div", ["item-expand"], "");
-    todoExpand.appendChild(createElement("span", ["description"], todo.getDescription()));
+    const descriptionSpan = createElement("span", ["description"], todo.getDescription())
+    todoExpand.appendChild(descriptionSpan);
 
     const buttonsContainer = createElement("div", ["buttons"], "");
-    buttonsContainer.appendChild(createElement("button", ["complete-button"], "Mark Completed"));
-    buttonsContainer.appendChild(createElement("button", ["edit-button"], "Edit"));
-    buttonsContainer.appendChild(createElement("button", ["delete-button"], "Delete"));
+
+    const completeButton = createElement("button", ["complete-button"], "Mark Completed");
+    const editButton = createElement("button", ["edit-button"], "Edit");
+
+    buttonsContainer.appendChild(completeButton);
+    buttonsContainer.appendChild(editButton);
+
+    completeButton.addEventListener("click", event => onCompleteClick());
+
+    const enterEditMode = () => {
+        const nameEdit = createElement("input", [], "");
+        nameEdit.type = "text";
+        nameEdit.value = todo.getName();
+
+        const descriptionEdit = createElement("textarea", [], "");
+        descriptionEdit.value = todo.getDescription();
+
+        const dueDateEdit = createElement("input", [], "");
+        dueDateEdit.type = "date";
+        dueDateEdit.value = todo.getDueDate();
+
+        const priorityEdit = createElement("select", [], "");
+        const highPriorityOption = createElement("option", [], "High");
+        highPriorityOption.value = "High";
+        const normalPriorityOption = createElement("option", [], "Normal");
+        normalPriorityOption.value = "Normal";
+        const lowPriorityOption = createElement("option", [], "Low");
+        lowPriorityOption.value = "Low";
+
+        priorityEdit.appendChild(highPriorityOption);
+        priorityEdit.appendChild(normalPriorityOption);
+        priorityEdit.appendChild(lowPriorityOption);
+
+        priorityEdit.value = todo.getPriority();
+
+        const saveButton = createElement("button", [], "Save");
+
+        nameEdit.addEventListener("click", event => event.stopPropagation());
+        dueDateEdit.addEventListener("click", event => event.stopPropagation());
+        priorityEdit.addEventListener("click", event => event.stopPropagation());
+        descriptionEdit.addEventListener("click", event => event.stopPropagation());
+
+        todoContent.replaceChild(nameEdit, nameSpan);
+        todoContent.replaceChild(dueDateEdit, dueDateSpan);
+        todoContent.replaceChild(priorityEdit, prioritySpan);
+        todoExpand.replaceChild(descriptionEdit, descriptionSpan);
+        buttonsContainer.replaceChild(saveButton, editButton);
+
+        saveButton.addEventListener("click", event => {
+            nameSpan.textContent = nameEdit.value;
+            dueDateSpan.textContent = dueDateEdit.value;
+            prioritySpan.textContent = priorityEdit.value;
+            descriptionSpan.textContent = descriptionEdit.value;
+
+            todo.setName(nameEdit.value);
+            todo.setDueDate(dueDateEdit.value);
+            todo.setPriority(priorityEdit.value);
+            todo.setDescription(descriptionEdit.value);
+
+            todoContent.replaceChild(nameSpan, nameEdit);
+            todoContent.replaceChild(dueDateSpan, dueDateEdit);
+            todoContent.replaceChild(prioritySpan, priorityEdit);
+            todoExpand.replaceChild(descriptionSpan, descriptionEdit);
+            buttonsContainer.replaceChild(editButton, saveButton);
+        })
+    }
+
+    editButton.addEventListener("click", event => enterEditMode());
 
     todoExpand.appendChild(buttonsContainer);
 
+    todoExpand.style["display"] = "none";
+
     todoContainer.appendChild(todoExpand);
+
+    todoContent.addEventListener("click", event => todoExpand.style["display"] = todoExpand.style["display"] === "none" ? "" : "none");
 
     return todoContainer;
 }
