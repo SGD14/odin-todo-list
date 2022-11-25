@@ -19,62 +19,102 @@ const ProjectNavigationMenu = (onProjectSelected) => {
     const projectNavigationMenu = createElement("div", ["project-menu"], "");
 
     const header = createElement("h1", [], "To-Do App");
+    projectNavigationMenu.appendChild(header);
 
     const subHeader = document.createElement("h2");
     
     const line1 = createElement("div", ["line"], "");
-    const subHeaderText = createElement("span", [], "Projects");
-    const line2 = createElement("div", ["line"], "");
-    
     subHeader.appendChild(line1);
+
+    const subHeaderText = createElement("span", [], "Projects");
     subHeader.appendChild(subHeaderText);
+
+    const line2 = createElement("div", ["line"], "");
     subHeader.appendChild(line2);
 
-    const projectListContainer = createElement("div", ["project-list"], "");
+    projectNavigationMenu.appendChild(subHeader);
 
-    const setSelected = (button) => {
-        projectListContainer.childNodes.forEach(node => {
-            if(node === button)
-                node.classList.add("selected");
-            else
-                node.classList.remove("selected");
+    let projectNavigationList = ProjectNavigationList(TodoDatabase.getProjects(), TodoDatabase.getProjects()[0], project => console.log("Project " + project.getName() + " selected!"));
+    projectNavigationMenu.appendChild(projectNavigationList);
+
+    const addNewProject = (newProjectName) => {
+        const newProject = TodoDatabase.addNewProject(newProjectName);
+
+        const oldNode = projectNavigationList;
+        const newNode = ProjectNavigationList(TodoDatabase.getProjects(), newProject, project => console.log("Project " + project.getName() + " selected!"));
+
+        projectNavigationMenu.replaceChild(newNode, oldNode);
+
+        projectNavigationList = newNode;
+    }
+
+    projectNavigationMenu.appendChild(ProjectCreationInput(projectName => addNewProject(projectName)));
+    
+    return projectNavigationMenu;
+}
+
+const ProjectNavigationList = (projectList, selectedProject, onProjectSelected) => {
+    const projectNavigationList = createElement("div", ["project-list"], "");
+
+    const markSelected = (projectNavigationElement) => {
+        projectNavigationList.childNodes.forEach(projectElement => {
+            if(projectElement === projectNavigationElement) {
+                projectElement.classList.add("selected");
+            } else {
+                projectElement.classList.remove("selected");
+            }
         });
     };
 
-    const ProjectButton = (project) => {
-        const projectButton = createElement("button", [], "");
+    const handleProjectClicked = (projectNavigationElement, project) => {
+        markSelected(projectNavigationElement);
+        onProjectSelected(project);
+    };
 
-        projectButton.appendChild(createElement("span", [], project.getName()));
+    const handleProjectRemoveClicked = (projectNavigationElement, project) => {
+        if(TodoDatabase.getProjects().length <= 1)
+            return;
 
-        const deleteButton = createElement("button", ["delete-button"], "X");
-        projectButton.appendChild(deleteButton);
+        projectNavigationList.removeChild(projectNavigationElement);
+        TodoDatabase.removeProject(project);
 
-        projectButton.addEventListener("click", event => {
-            setSelected(projectButton);
-            onProjectSelected(project);
-        });
-
-        deleteButton.addEventListener("click", event => {
-            event.stopPropagation();
-
-            if(TodoDatabase.getProjects().length <= 1) 
-                return;
-
-            TodoDatabase.removeProject(project);
-            projectListContainer.removeChild(projectButton);
-            setSelected(projectListContainer.firstChild);
+        if(projectNavigationElement.classList.contains("selected")) {
+            markSelected(projectNavigationList.firstChild);
             onProjectSelected(TodoDatabase.getProjects()[0]);
-        })
+        }
+    };
 
-        return projectButton;
-    }
+    projectList.forEach(project => {
+        const projectNavigationElement = ProjectNavigationElement(project, () => handleProjectClicked(projectNavigationElement, project), () => handleProjectRemoveClicked(projectNavigationElement, project));
 
-    TodoDatabase.getProjects().forEach(project => {
-        projectListContainer.appendChild(ProjectButton(project));
+        if(project === selectedProject)
+            projectNavigationElement.classList.add("selected");
+
+        projectNavigationList.appendChild(projectNavigationElement);
     });
 
-    projectListContainer.firstChild.classList.add("selected");
+    return projectNavigationList;
+}
 
+const ProjectNavigationElement = (project, onClick, onDeleteClick) => {
+    const projectNavigationElement = createElement("button", [], "");
+
+    projectNavigationElement.appendChild(createElement("span", [], project.getName()));
+
+    const deleteButton = createElement("button", ["delete-button"], "X");
+    projectNavigationElement.appendChild(deleteButton);
+
+    projectNavigationElement.addEventListener("click", event => onClick());
+
+    deleteButton.addEventListener("click", event => {
+        event.stopPropagation();
+        onDeleteClick();
+    });
+
+    return projectNavigationElement;
+}
+
+const ProjectCreationInput = (onSubmit) => {
     const newProjectInput = createElement("input", [], "");
     newProjectInput.type = "text";
     newProjectInput.placeholder = "New Project...";
@@ -84,27 +124,14 @@ const ProjectNavigationMenu = (onProjectSelected) => {
             const newProjectName = newProjectInput.value;
 
             if(newProjectName) {
-                const newProject = TodoDatabase.addNewProject(newProjectName);
-                const newProjectButton = ProjectButton(newProject);
-
-                projectListContainer.insertBefore(newProjectButton, newProjectInput);
-
-                setSelected(newProjectButton);
-                onProjectSelected(newProject);
-
                 newProjectInput.value = "";
                 newProjectInput.blur();
+                onSubmit(newProjectName);
             }
         }
     })
 
-    projectListContainer.appendChild(newProjectInput);
-
-    projectNavigationMenu.appendChild(header);
-    projectNavigationMenu.appendChild(subHeader);
-    projectNavigationMenu.appendChild(projectListContainer);
-    
-    return projectNavigationMenu;
+    return newProjectInput;
 }
 
 const ProjectContent = (project) => {

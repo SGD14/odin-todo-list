@@ -73,7 +73,7 @@ body {
     background-color: rgb(220, 220, 220);
 }
 
-.project-list > input {
+.project-menu > input {
     margin-top: 1rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
