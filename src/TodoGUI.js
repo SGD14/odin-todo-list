@@ -224,7 +224,7 @@ const TodoCreationContainer = (onTodoSubmit) => {
 }
 
 const TodoItem = (todo, onCompleteClick) => {
-    const todoContainer = createElement("div", ["todo-item"], "");
+    const todoContainer = createElement("div", ["todo-item", todo.getPriority().toLowerCase() + "-priority"], "");
 
     const todoContent = createElement("div", ["item-content"], "");
     todoContent.appendChild(createElement("span", ["arrow"], ">"));
@@ -252,7 +252,7 @@ const TodoItem = (todo, onCompleteClick) => {
     completeButton.addEventListener("click", event => onCompleteClick());
 
     const enterEditMode = () => {
-        const nameEdit = createElement("input", [], "");
+        const nameEdit = createElement("input", ["name"], "");
         nameEdit.type = "text";
         nameEdit.value = todo.getName();
 
@@ -277,7 +277,7 @@ const TodoItem = (todo, onCompleteClick) => {
 
         priorityEdit.value = todo.getPriority();
 
-        const saveButton = createElement("button", [], "Save");
+        const saveButton = createElement("button", ["edit-button"], "Save");
 
         nameEdit.addEventListener("click", event => event.stopPropagation());
         dueDateEdit.addEventListener("click", event => event.stopPropagation());
@@ -306,6 +306,9 @@ const TodoItem = (todo, onCompleteClick) => {
             todoContent.replaceChild(prioritySpan, priorityEdit);
             todoExpand.replaceChild(descriptionSpan, descriptionEdit);
             buttonsContainer.replaceChild(editButton, saveButton);
+
+            ["low-priority", "normal-priority", "high-priority"].forEach(priorityClass => todoContainer.classList.remove(priorityClass));
+            todoContainer.classList.add(todo.getPriority().toLowerCase() + "-priority");
         })
     }
 
